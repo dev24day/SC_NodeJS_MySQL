@@ -22,7 +22,7 @@ var app = http.createServer(function(request,response){
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
     if(pathname === '/'){
-      if(queryData.id === undefined){
+      if(queryData.id === undefined){ //Home page 구현
 		db.query('SELECT * FROM topic', function (error, topics, fields) {
   			if (error) throw error;
 			var title = 'Welcome';
@@ -32,31 +32,55 @@ var app = http.createServer(function(request,response){
 			response.writeHead(200);
 			response.end(html)
 		});
-      } else {
-        fs.readdir('./data', function(error, filelist){
-          var filteredId = path.parse(queryData.id).base;
-          fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
-            var title = queryData.id;
-            var sanitizedTitle = sanitizeHtml(title);
-            var sanitizedDescription = sanitizeHtml(description, {
-              allowedTags:['h1']
-            });
-            var list = template.list(filelist);
-            var html = template.HTML(sanitizedTitle, list,
-              `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
-              ` <a href="/create">create</a>
-                <a href="/update?id=${sanitizedTitle}">update</a>
-                <form action="delete_process" method="post">
-                  <input type="hidden" name="id" value="${sanitizedTitle}">
-                  <input type="submit" value="delete">
-                </form>`
-            );
-            response.writeHead(200);
-            response.end(html);
-          });
-        });
+      } else { //Description page
+        // fs.readdir('./data', function(error, filelist){
+        //   var filteredId = path.parse(queryData.id).base;
+        //   fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
+        //     var title = queryData.id;
+        //     var sanitizedTitle = sanitizeHtml(title);
+        //     var sanitizedDescription = sanitizeHtml(description, {
+        //       allowedTags:['h1']
+        //     });
+        //     var list = template.list(filelist);
+        //     var html = template.HTML(sanitizedTitle, list,
+        //       `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
+              // ` <a href="/create">create</a>
+              //   <a href="/update?id=${sanitizedTitle}">update</a>
+              //   <form action="delete_process" method="post">
+              //     <input type="hidden" name="id" value="${sanitizedTitle}">
+              //     <input type="submit" value="delete">
+              //   </form>`
+        //     );
+        //     response.writeHead(200);
+        //     response.end(html);
+        //   });
+        // });
+		  db.query('SELECT * FROM topic', function(error, topics){
+			  if (error) throw error;
+			  var filteredId = path.parse(queryData.id).base;
+			  db.query(`SELECT * FROM topic WHERE id=${filteredId}`, function(err, result, fields){
+				  if (err) throw err;
+				  var sanitizedTitle = sanitizeHtml(result[0].title);
+				  var sanitizedDesc = sanitizeHtml(result[0].description, {
+				  allowedTags:['h1']
+				  });
+				  var list = template.list(topics);
+				  var html = template.HTML(sanitizedTitle, list,
+				  `<h2>${sanitizedTitle}</h2>${sanitizedDesc}`,
+				  `<a href="/create">create</a>
+				  <a href="/update?id=${sanitizedTitle}">update</a>
+				  <form action="delete_process" method="post">
+				  <input type="hidden" name="id" value="${sanitizedTitle}">
+				  <input type="submit" value="delete">
+				  </form>`);
+				  console.log(result[0].title, result[0].description);
+
+				  response.writeHead(200);
+				  response.end(html);
+			  })
+		  })
       }
-    } else if(pathname === '/create'){
+    } else if(pathname === '/create'){ //Create page
       fs.readdir('./data', function(error, filelist){
         var title = 'WEB - create';
         var list = template.list(filelist);
@@ -88,7 +112,7 @@ var app = http.createServer(function(request,response){
             response.end();
           })
       });
-    } else if(pathname === '/update'){
+    } else if(pathname === '/update'){ //Update page
       fs.readdir('./data', function(error, filelist){
         var filteredId = path.parse(queryData.id).base;
         fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){

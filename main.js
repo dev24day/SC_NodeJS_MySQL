@@ -33,32 +33,10 @@ var app = http.createServer(function(request,response){
 			response.end(html)
 		});
       } else { //Description page
-        // fs.readdir('./data', function(error, filelist){
-        //   var filteredId = path.parse(queryData.id).base;
-        //   fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
-        //     var title = queryData.id;
-        //     var sanitizedTitle = sanitizeHtml(title);
-        //     var sanitizedDescription = sanitizeHtml(description, {
-        //       allowedTags:['h1']
-        //     });
-        //     var list = template.list(filelist);
-        //     var html = template.HTML(sanitizedTitle, list,
-        //       `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
-              // ` <a href="/create">create</a>
-              //   <a href="/update?id=${sanitizedTitle}">update</a>
-              //   <form action="delete_process" method="post">
-              //     <input type="hidden" name="id" value="${sanitizedTitle}">
-              //     <input type="submit" value="delete">
-              //   </form>`
-        //     );
-        //     response.writeHead(200);
-        //     response.end(html);
-        //   });
-        // });
 		  db.query('SELECT * FROM topic', function(error, topics){
 			  if (error) throw error;
 			  var filteredId = path.parse(queryData.id).base;
-			  db.query(`SELECT * FROM topic WHERE id=${filteredId}`, function(err, result, fields){
+			  db.query(`SELECT * FROM topic WHERE id=?`,[filteredId], function(err, result, fields){
 				  if (err) throw err;
 				  var sanitizedTitle = sanitizeHtml(result[0].title);
 				  var sanitizedDesc = sanitizeHtml(result[0].description, {
@@ -68,9 +46,9 @@ var app = http.createServer(function(request,response){
 				  var html = template.HTML(sanitizedTitle, list,
 				  `<h2>${sanitizedTitle}</h2>${sanitizedDesc}`,
 				  `<a href="/create">create</a>
-				  <a href="/update?id=${sanitizedTitle}">update</a>
+				  <a href="/update?id=${filteredId}">update</a>
 				  <form action="delete_process" method="post">
-				  <input type="hidden" name="id" value="${sanitizedTitle}">
+				  <input type="hidden" name="id" value="${filteredId}">
 				  <input type="submit" value="delete">
 				  </form>`);
 				  console.log(result[0].title, result[0].description);

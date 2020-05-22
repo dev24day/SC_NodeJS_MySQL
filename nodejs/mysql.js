@@ -7,7 +7,7 @@ var connection = mysql.createConnection({
   password : userinfo.password,
   database : 'opentutorials'
 });
- 
+
 connection.connect();
  
 connection.query('SELECT * FROM topic', function (error, results, fields) {

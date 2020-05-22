@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main.js -p 3000 -b 0.0.0.0"
+	"start": "node main.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   "homepage": "https://github.com/web-n/Nodejs#readme",
   "dependencies": {
     "mysql": "^2.18.1",
+    "pm2": "^4.4.0",
     "sanitize-html": "^1.18.2"
   }
 }

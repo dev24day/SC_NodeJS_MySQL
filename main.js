@@ -1,6 +1,7 @@
 var http = require('http');
 var url = require('url');
 var topic = require('./lib/topic.js');
+var author = require('./lib/author.js');
 
 var app = http.createServer(function(request, response) {
 	var _url = request.url;
@@ -12,6 +13,8 @@ var app = http.createServer(function(request, response) {
 		} else {
 			topic.page(request, response);
 		}
+	} else if (pathname === '/author') {
+		author.index(request, response);
 	} else if (pathname === '/create') {
 		topic.create(request, response);
 	} else if (pathname === '/create_process') {
